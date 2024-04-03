@@ -11,3 +11,9 @@
 2. Click "service worker" under the extension card
 
 ![Open Service Worker](.github/image.png)
+
+### TODO
+- bunch of TODO comments in [scripts/background-worker.js](./extension/scripts/background-worker.js)
+- bundle process for easy dev against local server
+- popup UI
+- options UI
