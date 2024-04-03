@@ -19,7 +19,8 @@
   ],
   "host_permissions": [
     "https://steamcommunity.com/my",
-    "https://steamcommunity.com/inventory/*/730/2"
+    "https://steamcommunity.com/inventory/*/730/2",
+    "https://cs2-inventory.froggly.dev/inventory/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
