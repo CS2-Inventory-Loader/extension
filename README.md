@@ -1,9 +1,10 @@
 # CS2 Inventory Extension
-
-### Goal
 Our goal is to standarize the `window.cs2inventory` api for all extensions to use. Any extension can provide spec-compliant implementation of `window.cs2inventory` for any site to use. This way users can benefit from extension on all websites, similarly to how many web3 wallets share the same API.
 
-### Standard
+Discuss: https://discord.gg/kXJGt9vPhy
+
+
+### API
 ```ts
 function loadInventory(appId: number, contextId: number | string): Promise<SteamInventory>
 ```
