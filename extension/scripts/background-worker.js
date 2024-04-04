@@ -63,15 +63,22 @@ async function getUserInventory(appId, contextId) {
 
   const steamId = await getSteamId()
   const inventory = await fetchInventory(steamId, appId, contextId)
-  
+
   return inventory
+}
+
+
+async function executeCommand(fn, respond) {
+  return fn()
+    .then((payload) => respond({ success: true, payload }))
+    .catch((err) => respond({ success: false, error: err.message }))
 }
 
 // NOTE the handlers cannot be async due to safari bug iirc
 browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
   switch(event) {
     case 'get-inventory':
-      getUserInventory(data.appId, data.contextId).then(respond)
+      executeCommand(() => getUserInventory(data.appId, data.contextId), respond)
       break
     default:
       console.warn('Unknown event', event)

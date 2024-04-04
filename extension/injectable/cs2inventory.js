@@ -10,7 +10,7 @@ function install() {
           return resolve(resp.detail.payload)
         }
 
-        return reject('Failed to execute')
+        return reject(resp.detail.error)
       }, { once: true })
 
       window.dispatchEvent(new CustomEvent(eventName, { detail: payload }))

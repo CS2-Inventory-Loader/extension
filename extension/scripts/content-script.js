@@ -21,8 +21,7 @@ async function handleEvent(eventName, handler) {
       const payload = await handler(event)
       window.dispatchEvent(new CustomEvent(`${eventName};reply`, { detail: { success: true, payload } }))
     } catch (err) {
-      console.error(`Failed to execute "${eventName}"`, err)
-      window.dispatchEvent(new CustomEvent(`${eventName};reply`, { detail: { success: false } }))
+      window.dispatchEvent(new CustomEvent(`${eventName};reply`, { detail: { success: false, error: err } }))
     }
   })
 }
@@ -35,10 +34,16 @@ function installHostScript() {
 }
 
 handleEvent('cs2il:get-inventory', async (event) => {
-  return browser.runtime.sendMessage({
+  const response = await browser.runtime.sendMessage({
     event: 'get-inventory',
     data: event.detail,
   })
+
+  if (response.success === false) {
+    throw new Error(response.error)
+  }
+
+  return response.payload
 })
 
 installHostScript()
