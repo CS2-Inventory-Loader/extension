@@ -26,7 +26,7 @@ Check if cs2inventory is present in user browser. Fetch inventory using the exte
       body: JSON.stringify(inventory)
     })
   }
-</html>
+</script>
 ```
 
 ### Install (dev)
