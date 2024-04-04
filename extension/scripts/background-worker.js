@@ -16,6 +16,12 @@ async function fetchInventory(steamId, appId, contextId) {
   return inventory
 }
 
+async function getUserInventory(appId, contextId) {
+  const steamId = await getSteamId()
+  const inventory = await fetchInventory(steamId, appId, contextId)
+  return inventory
+}
+
 async function ensureContentScript(tabId, attempt = 0) {
   try {
     // will throw if content script is not injected unless safari
@@ -43,28 +49,19 @@ async function ensureContentScript(tabId, attempt = 0) {
   }
 }
 
-// action handlers
+async function executeCommand(fn, respond) {
+  return fn()
+    .then((payload) => respond({ success: true, payload }))
+    .catch((err) => respond({ success: false, error: err.message }))
+}
 
+// action handlers
 browser.action.onClicked.addListener(async (tab) => {
   await ensureContentScript(tab.id)
 
   // TODO turn icon green or something to show user the content script is loaded
   // maybe via content script message to also double check comms work
 })
-
-async function getUserInventory(appId, contextId) {
-  const steamId = await getSteamId()
-  const inventory = await fetchInventory(steamId, appId, contextId)
-
-  return inventory
-}
-
-
-async function executeCommand(fn, respond) {
-  return fn()
-    .then((payload) => respond({ success: true, payload }))
-    .catch((err) => respond({ success: false, error: err.message }))
-}
 
 // NOTE the handlers cannot be async due to safari bug iirc
 browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
