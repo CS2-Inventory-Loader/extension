@@ -1,4 +1,6 @@
-if (!globalThis.browser) globalThis.browser = globalThis.chrome
+if (!globalThis.browser) {
+  globalThis.browser = globalThis.chrome
+}
 
 async function getSteamId() {
   // TODO: Cache steamid
@@ -21,7 +23,9 @@ async function ensureContentScript(tabId, attempt = 0) {
     const res = await browser.tabs.sendMessage(tabId, { event: 'content-script-check' })
 
     // Safari returns undefined instead of throwing
-    if (res === undefined) throw new Error('No response from content script')
+    if (res === undefined) {
+      throw new Error('No response from content script')
+    }
 
     // otherwise if we receive a response, we know the content script is injected
     return true
@@ -32,7 +36,9 @@ async function ensureContentScript(tabId, attempt = 0) {
     })
 
     // avoid infinite loop
-    if (!attempt) return ensureContentScript(tabId, 1)
+    if (!attempt) {
+      return ensureContentScript(tabId, 1)
+    }
 
     throw new Error(`Failed to inject content script into tab ${tabId}`)
   }
