@@ -6,6 +6,10 @@
   "action": {
     "default_icon": "./assets/icon-512.png"
   },
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
   "background": {
     "service_worker": "./scripts/background-worker.js"
   },
@@ -14,14 +18,10 @@
     "48": "./assets/icon-512.png",
     "128": "./assets/icon-512.png"
   },
-  "permissions": [
-    "webRequest"
-  ],
   "host_permissions": [
     "https://steamcommunity.com/my",
     "https://steamcommunity.com/inventory/*/730/2",
-    "https://cs2inventory.dev/*",
-    "<all_urls>"
+    "https://cs2inventory.dev/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
