@@ -15,12 +15,13 @@
     "128": "./assets/icon-512.jpg"
   },
   "permissions": [
-    "alarms"
+    "webRequest"
   ],
   "host_permissions": [
     "https://steamcommunity.com/my",
     "https://steamcommunity.com/inventory/*/730/2",
-    "https://cs2-inventory.froggly.dev/inventory/*"
+    "https://cs2inventory.dev/*",
+    "<all_urls>"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"

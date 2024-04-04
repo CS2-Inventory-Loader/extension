@@ -1,14 +1,20 @@
-chrome.runtime.onInstalled.addListener(() => {
-  updateInventory()
-  chrome.alarms.create('update-inventory', { periodInMinutes: 1 })
-})
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  switch (alarm.name) {
-    case 'update-inventory':
-      return updateInventory()
+chrome.webRequest.onBeforeRequest.addListener(async (details) => {
+  if (details.url !== 'https://cs2inventory.dev/capture') {
+    return
   }
-})
+
+  const initiatorHost = new URL(details.initiator).host
+  const steamId = await getSteamId()
+  const inventory = await fetchInventory(steamId, 730, 2)
+
+  await fetch(`https://cs2inventory.dev/report/${initiatorHost}/${steamId}`, { 
+    body: JSON.stringify(inventory), 
+    headers: { 
+      'Content-Type': 'application/json',
+    }, 
+    method: 'POST' 
+  })
+}, { urls: ['https://cs2inventory.dev/*'] })
 
 async function getSteamId() {
   // TODO: Cache steamid
@@ -17,31 +23,7 @@ async function getSteamId() {
   return match ? match[1] : null
 }
 
-async function updateInventory() {
-  const steamId = await getSteamId()
-
-  if (!steamId) {
-    return
-  }
-
-  const inventory = await getSteamInventory(steamId, 730, 2)
-
-  // TODO: Consider compressing payload
-  await reportInventory(steamId, inventory)
-}
-
-async function reportInventory(steamId, inventory) {
-  // TODO: Finalize domain
-  // TODO: Optional user-selected cache server under subdomain
-  // TODO: Cache inventory locally and ping only when it updates
-  await fetch(`https://cs2-inventory.froggly.dev/inventory/${steamId}`, { 
-    body: JSON.stringify(inventory), 
-    headers: { 'Content-Type': 'application/json' }, 
-    method: 'POST' 
-  })
-}
-
-async function getSteamInventory(steamId, appId, contextId) {
+async function fetchInventory(steamId, appId, contextId) {
   // TODO: Send referrer header
   // TODO: Load next batch of items (steam does 75 then 2000)
   // TODO: Error handling
