@@ -2,13 +2,13 @@ if (!globalThis.browser) {
   globalThis.browser = globalThis.chrome
 }
 
-async function getSteamId() {
+async function getSteamId () {
   const profileXML = await fetch('https://steamcommunity.com/my?xml=1').then(r => r.text())
-  const match = profileXML.match(/\<steamID64\>(\d{17})\<\/steamID64\>/)
+  const match = profileXML.match(/<steamID64>(\d{17})<\/steamID64>/)
   return match ? match[1] : null
 }
 
-async function fetchInventory(steamId, appId, contextId) {
+async function fetchInventory (steamId, appId, contextId) {
   // TODO: Send referrer header
   // TODO: Load next batch of items (steam does 75 then 2000)
   // TODO: Error handling
@@ -16,14 +16,14 @@ async function fetchInventory(steamId, appId, contextId) {
   return inventory
 }
 
-async function getUserInventory(appId, contextId) {
+async function getUserInventory (appId, contextId) {
   const steamId = await getSteamId()
   const inventory = await fetchInventory(steamId, appId, contextId)
   return inventory
 }
 
 // internal helpers
-async function ensureContentScript(tabId, attempt = 0) {
+async function ensureContentScript (tabId, attempt = 0) {
   try {
     // will throw if content script is not injected unless safari
     const res = await browser.tabs.sendMessage(tabId, { event: 'content-script-check' })
@@ -38,7 +38,7 @@ async function ensureContentScript(tabId, attempt = 0) {
   } catch (error) {
     await browser.scripting.executeScript({
       target: { tabId },
-      files: ['scripts/content-script.js'],
+      files: ['scripts/content-script.js']
     })
 
     // avoid infinite loop
@@ -50,28 +50,28 @@ async function ensureContentScript(tabId, attempt = 0) {
   }
 }
 
-async function executeCommand(fn, respond) {
+async function executeCommand (fn, respond) {
   return fn()
     .then((payload) => respond({ success: true, payload }))
     .catch((err) => respond({ success: false, error: err.message }))
 }
 
-function requestHostPermission(tab) {
+// eslint-disable-next-line no-unused-vars
+function requestHostPermission (tab) {
   const tabUrl = new URL(tab.url)
 
-  if(tabUrl.protocol !== 'https:') {
+  if (tabUrl.protocol !== 'https:') {
     throw new Error('Host must be secure (https)')
   }
 
   const hostOrigin = tabUrl.origin
-  if(!hostOrigin) {
+  if (!hostOrigin) {
     throw new Error('Failed to extract host origin')
   }
 
   console.debug('Requesting permission for', hostOrigin)
   return browser.permissions.request({ origins: [`${hostOrigin}/*`] })
 }
-
 
 // action handlers
 browser.action.onClicked.addListener(async (tab) => {
@@ -83,10 +83,9 @@ browser.action.onClicked.addListener(async (tab) => {
   // TODO turn icon green or something to show user the content script is loaded?
 })
 
-
 // NOTE the handlers cannot be async due to safari bug iirc
 browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
-  switch(event) {
+  switch (event) {
     case 'get-inventory':
       executeCommand(() => getUserInventory(data.appId, data.contextId), respond)
       break
@@ -98,23 +97,22 @@ browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
   return true
 })
 
-
 browser.permissions.onAdded.addListener(async (permissions) => {
   const newOrigins = permissions.origins
-  if(!newOrigins.length) return
+  if (!newOrigins.length) return
 
   console.debug('Permission added for', newOrigins)
 
-  const [activeScript] = await browser.scripting.getRegisteredContentScripts({ids: ['content-script']})
+  const [activeScript] = await browser.scripting.getRegisteredContentScripts({ ids: ['content-script'] })
 
   const newScript = {
     id: 'content-script',
     js: ['scripts/content-script.js'],
     matches: [...(new Set([...activeScript?.matches ?? [], ...newOrigins]))],
-    runAt: 'document_idle',
+    runAt: 'document_idle'
   }
 
-  if(activeScript) {
+  if (activeScript) {
     await browser.scripting.updateContentScripts([newScript])
   } else {
     await browser.scripting.registerContentScripts([newScript])
@@ -125,16 +123,16 @@ browser.permissions.onAdded.addListener(async (permissions) => {
 
 browser.permissions.onRemoved.addListener(async (permissions) => {
   const removedOrigins = permissions.origins
-  if(!removedOrigins.length) return
+  if (!removedOrigins.length) return
 
   console.debug('Removed permission for', removedOrigins)
 
-  const [activeScript] = await browser.scripting.getRegisteredContentScripts({ids: ['content-script']})
+  const [activeScript] = await browser.scripting.getRegisteredContentScripts({ ids: ['content-script'] })
 
   const newOrigins = []
-  if(activeScript) {
-    for(const origin of activeScript.matches) {
-      if(removedOrigins.includes(origin)) continue
+  if (activeScript) {
+    for (const origin of activeScript.matches) {
+      if (removedOrigins.includes(origin)) continue
       newOrigins.push(origin)
     }
   }
@@ -143,16 +141,16 @@ browser.permissions.onRemoved.addListener(async (permissions) => {
     id: 'content-script',
     js: ['scripts/content-script.js'],
     matches: newOrigins,
-    runAt: 'document_idle',
+    runAt: 'document_idle'
   }
 
-  if(activeScript) {
-    if(newScript.matches.length) {
+  if (activeScript) {
+    if (newScript.matches.length) {
       await browser.scripting.updateContentScripts([newScript])
     } else {
       await browser.scripting.unregisterContentScripts({ ids: ['content-script'] })
     }
-  } else if(newScript.matches.length) {
+  } else if (newScript.matches.length) {
     await browser.scripting.registerContentScripts([newScript])
   }
 

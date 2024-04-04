@@ -15,7 +15,7 @@ browser.runtime.onMessage.addListener((request, sender, respond) => {
   return true
 })
 
-async function handleEvent(eventName, handler) {
+async function handleEvent (eventName, handler) {
   window.addEventListener(eventName, async (event) => {
     try {
       const payload = await handler(event)
@@ -26,7 +26,7 @@ async function handleEvent(eventName, handler) {
   })
 }
 
-function installHostScript() {
+function installHostScript () {
   const hostScriptUrl = browser.runtime.getURL('injectable/cs2inventory.js')
   const script = document.createElement('script')
   script.setAttribute('src', hostScriptUrl)
@@ -48,7 +48,7 @@ handleEvent('cs2il:get-inventory', async (event) => {
 
   const response = await browser.runtime.sendMessage({
     event: 'get-inventory',
-    data: event.detail,
+    data: event.detail
   })
 
   if (response.success === false) {

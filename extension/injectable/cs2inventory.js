@@ -1,9 +1,9 @@
-function install() {
+function install () {
   if ('cs2inventory' in window) {
-    retrun
+    return
   }
 
-  function execute(eventName, payload, timeout = 30e3) {
+  function execute (eventName, payload, timeout = 30e3) {
     return new Promise((resolve, reject) => {
       window.addEventListener(`${eventName};reply`, resp => {
         if (resp.detail.success) {
@@ -14,17 +14,16 @@ function install() {
       }, { once: true })
 
       window.dispatchEvent(new CustomEvent(eventName, { detail: payload }))
-  
-      setTimeout(() => reject('Timeout'), timeout)
+
+      setTimeout(() => reject(new Error('Timeout')), timeout)
     })
   }
 
   window.cs2Inventory = {
-    loadInventory(appId, contextId) {
+    loadInventory (appId, contextId) {
       return execute('cs2il:get-inventory', { appId, contextId })
     }
   }
 }
 
 install()
-
