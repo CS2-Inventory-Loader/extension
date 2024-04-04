@@ -3,7 +3,6 @@ if (!globalThis.browser) {
 }
 
 async function getSteamId() {
-  // TODO: Cache steamid
   const profileXML = await fetch('https://steamcommunity.com/my?xml=1').then(r => r.text())
   const match = profileXML.match(/\<steamID64\>(\d{17})\<\/steamID64\>/)
   return match ? match[1] : null
@@ -51,6 +50,12 @@ async function ensureContentScript(tabId, attempt = 0) {
   }
 }
 
+async function executeCommand(fn, respond) {
+  return fn()
+    .then((payload) => respond({ success: true, payload }))
+    .catch((err) => respond({ success: false, error: err.message }))
+}
+
 function requestHostPermission(tab) {
   const tabUrl = new URL(tab.url)
 
@@ -83,7 +88,7 @@ browser.action.onClicked.addListener(async (tab) => {
 browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
   switch(event) {
     case 'get-inventory':
-      getUserInventory(data.appId, data.contextId).then(respond)
+      executeCommand(() => getUserInventory(data.appId, data.contextId), respond)
       break
     default:
       console.warn('Unknown event', event)
