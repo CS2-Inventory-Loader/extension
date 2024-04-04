@@ -1,4 +1,6 @@
-if (!globalThis.browser) globalThis.browser = globalThis.chrome
+if (!globalThis.browser) {
+  globalThis.browser = globalThis.chrome
+}
 
 async function getSteamId() {
   // TODO: Cache steamid
@@ -15,13 +17,21 @@ async function fetchInventory(steamId, appId, contextId) {
   return inventory
 }
 
+async function getUserInventory(appId, contextId) {
+  const steamId = await getSteamId()
+  const inventory = await fetchInventory(steamId, appId, contextId)
+  return inventory
+}
+
 async function ensureContentScript(tabId, attempt = 0) {
   try {
     // will throw if content script is not injected unless safari
     const res = await browser.tabs.sendMessage(tabId, { event: 'content-script-check' })
 
     // Safari returns undefined instead of throwing
-    if (res === undefined) throw new Error('No response from content script')
+    if (res === undefined) {
+      throw new Error('No response from content script')
+    }
 
     // otherwise if we receive a response, we know the content script is injected
     return true
@@ -32,26 +42,21 @@ async function ensureContentScript(tabId, attempt = 0) {
     })
 
     // avoid infinite loop
-    if (!attempt) return ensureContentScript(tabId, 1)
+    if (!attempt) {
+      return ensureContentScript(tabId, 1)
+    }
 
     throw new Error(`Failed to inject content script into tab ${tabId}`)
   }
 }
 
 // action handlers
-
 browser.action.onClicked.addListener(async (tab) => {
   await ensureContentScript(tab.id)
 
   // TODO turn icon green or something to show user the content script is loaded
   // maybe via content script message to also double check comms work
 })
-
-async function getUserInventory(appId, contextId) {
-  const steamId = await getSteamId()
-  const inventory = await fetchInventory(steamId, appId, contextId)
-  return inventory
-}
 
 // NOTE the handlers cannot be async due to safari bug iirc
 browser.runtime.onMessage.addListener(({ event, data }, sender, respond) => {
