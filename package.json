@@ -1,4 +1,7 @@
 {
   "name": "cs2-inventory-extension",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^120.0.3"
+  }
 }
