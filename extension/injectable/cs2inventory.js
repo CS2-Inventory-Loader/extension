@@ -19,7 +19,7 @@ function install () {
     })
   }
 
-  window.cs2Inventory = {
+  window.cs2inventory = {
     loadInventory (appId, contextId) {
       return execute('cs2il:get-inventory', { appId, contextId })
     }
