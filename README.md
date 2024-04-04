@@ -1,5 +1,34 @@
 # CS2 Inventory Extension
 
+### Goal
+Our goal is to standarize the `window.cs2inventory` api for all extensions to use. Any extension can provide spec-compliant implementation of `window.cs2inventory` for any site to use. This way users can benefit from extension on all websites, similarly to how many web3 wallets share the same API.
+
+### Standard
+```ts
+function loadInventory(appId: number, contextId: number | string): Promise<SteamInventory>
+```
+
+### Usage (host site)
+Check if cs2inventory is present in user browser. Fetch inventory using the extension and send to your API for processing
+
+```html
+<script>
+  // Client-side code, this is executed in browser
+  if ('cs2inventory' in window) {
+    const inventory = await window.cs2inventory.loadInventory(730, 2)
+    reportUserInventory(inventory)
+  }
+
+  async function reportUserInventory(inventory) {
+    // All request to this endpoint should be treated as UNSAFE
+    return fetch('/api/report-user-inventory', {
+      method: 'POST',
+      body: JSON.stringify(inventory)
+    })
+  }
+</html>
+```
+
 ### Install (dev)
 1. Visit chrome://extensions
 2. Enable developer mode (upper right corner)
@@ -11,23 +40,3 @@
 2. Click "service worker" under the extension card
 
 ![Open Service Worker](.github/image.png)
-
-### Current usage
-Subject to change.
-
-```js
-async getInventory(appId, contextId) {
-  return new Promise((resolve, reject) => {
-    window.addEventListener('cs2:get-inventory;reply', resp => resolve(resp.detail), { once: true })
-    window.dispatchEvent(new CustomEvent('cs2:get-inventory', { detail: { appId, contextId }}))
-
-    setTimeout(() => reject('Timeout'), 30e3)
-  })
-}
-```
-
-### TODO
-- bunch of TODO comments in [scripts/background-worker.js](./extension/scripts/background-worker.js)
-- bundle process for easy dev against local server
-- popup UI
-- options UI
