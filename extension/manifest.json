@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CS2 Inventory Loader",
-  "version": "0.0.69",
+  "version": "0.0.1",
   "description": "Load your CS2 Steam inventory and share it with various websites",
   "action": {
     "default_icon": "./assets/icon-512.png"
