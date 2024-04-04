@@ -3,7 +3,6 @@ if (!globalThis.browser) {
 }
 
 async function getSteamId() {
-  // TODO: Cache steamid
   const profileXML = await fetch('https://steamcommunity.com/my?xml=1').then(r => r.text())
   const match = profileXML.match(/\<steamID64\>(\d{17})\<\/steamID64\>/)
   return match ? match[1] : null
@@ -54,8 +53,17 @@ browser.action.onClicked.addListener(async (tab) => {
 })
 
 async function getUserInventory(appId, contextId) {
+  if (appId !== 730) {
+    throw new Error('Only appId=730 is currently supported')
+  }
+
+  if (contextId !== 2) {
+    throw new Error('Only contextId=2 is currently supported')
+  }
+
   const steamId = await getSteamId()
   const inventory = await fetchInventory(steamId, appId, contextId)
+  
   return inventory
 }
 
