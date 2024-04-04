@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Load your CS2 Steam inventory and share it with various websites",
   "action": {
-    "default_icon": "./assets/icon-512.jpg"
+    "default_icon": "./assets/icon-512.png"
   },
   "permissions": [
     "scripting",
@@ -14,9 +14,9 @@
     "service_worker": "./scripts/background-worker.js"
   },
   "icons": {
-    "16": "./assets/icon-512.jpg",
-    "48": "./assets/icon-512.jpg",
-    "128": "./assets/icon-512.jpg"
+    "16": "./assets/icon-512.png",
+    "48": "./assets/icon-512.png",
+    "128": "./assets/icon-512.png"
   },
   "host_permissions": [
     "https://steamcommunity.com/my",
