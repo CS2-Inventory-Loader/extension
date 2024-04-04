@@ -34,6 +34,18 @@ function installHostScript() {
 }
 
 handleEvent('cs2il:get-inventory', async (event) => {
+  if (!event.detail) {
+    throw new Error('loadInventory(appId, contextId) requires params, received none')
+  }
+
+  if (event.detail.appId !== 730) {
+    throw new Error(`Only appId=730 is currently supported, received: ${event.detail.appId}`)
+  }
+
+  if (event.detail.contextId !== 2) {
+    throw new Error(`Only contextId=2 is currently supported, received: ${event.detail.contextId}`)
+  }
+
   const response = await browser.runtime.sendMessage({
     event: 'get-inventory',
     data: event.detail,

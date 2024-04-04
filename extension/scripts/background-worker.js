@@ -53,14 +53,6 @@ browser.action.onClicked.addListener(async (tab) => {
 })
 
 async function getUserInventory(appId, contextId) {
-  if (appId !== 730) {
-    throw new Error('Only appId=730 is currently supported')
-  }
-
-  if (contextId !== 2) {
-    throw new Error('Only contextId=2 is currently supported')
-  }
-
   const steamId = await getSteamId()
   const inventory = await fetchInventory(steamId, appId, contextId)
 
