@@ -63,8 +63,6 @@ function requestHostPermission(tab) {
     throw new Error('Failed to extract host origin')
   }
 
-  // NOTE we can't check for perms.contains because async breaks user gesture requirement
-
   console.debug('Requesting permission for', hostOrigin)
   return browser.permissions.request({ origins: [`${hostOrigin}/*`] })
 }
@@ -73,8 +71,7 @@ function requestHostPermission(tab) {
 // action handlers
 browser.action.onClicked.addListener(async (tab) => {
   // TODO context menu items to persist permission until popup ui is made
-  const granted = await requestHostPermission(tab)
-  console.log(granted)
+  // await requestHostPermission(tab)
 
   await ensureContentScript(tab.id)
 
