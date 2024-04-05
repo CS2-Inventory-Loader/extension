@@ -9,11 +9,43 @@ async function getSteamId () {
 }
 
 async function fetchInventory (steamId, appId, contextId) {
-  // TODO: Send referrer header
-  // TODO: Load next batch of items (steam does 75 then 2000)
-  // TODO: Error handling
-  const inventory = await fetch(`https://steamcommunity.com/inventory/${steamId}/${appId}/${contextId}?l=english&count=75`).then(r => r.json())
-  return inventory
+  const baseFetchUrl = `https://steamcommunity.com/inventory/${steamId}/${appId}/${contextId}`;
+  let fetchUrl = `${baseFetchUrl}?l=english&count=75`; // First fetch for 75 items
+
+  const fetchOptions = {
+    headers: {
+      'Referrer': 'https://steamcommunity.com/profiles/' + steamId + '/inventory/',
+      'Accept': 'application/json'
+    }
+  };
+
+  // Fetch the first set of items
+  let response = await fetch(fetchUrl, fetchOptions);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch inventory: ${response.statusText}`);
+  }
+  let inventory = await response.json();
+
+  // Check if more items are available and fetch the next batch of up to 2000 items
+  if (inventory.more_items) {
+    const lastAssetId = inventory.last_assetid;
+    fetchUrl = `${baseFetchUrl}?l=english&count=2000&start_assetid=${lastAssetId}`;
+    
+    response = await fetch(fetchUrl, fetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch additional inventory: ${response.statusText}`);
+    }
+    const additionalInventory = await response.json();
+
+    // Combine the first and second fetch results
+    inventory.assets = inventory.assets.concat(additionalInventory.assets || []);
+    inventory.descriptions = inventory.descriptions.concat(additionalInventory.descriptions || []);
+    // Update the pagination and count details based on the second fetch
+    inventory.last_assetid = additionalInventory.last_assetid;
+    inventory.more_items = additionalInventory.more_items;
+  }
+
+  return inventory;
 }
 
 async function getUserInventory (appId, contextId) {
