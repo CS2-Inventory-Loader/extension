@@ -1,7 +1,6 @@
 import contentScript from 'url:~lib/content-script';
-import installHostScript from '~lib/content-script';
-import install from "url:~lib/test";
-import icon from "url:~assets/icon.png";
+import injectorScript from '~lib/content-script';
+import scriptURL from "url:~lib/inventory";
 
 if (!globalThis.browser) {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -9,16 +8,13 @@ if (!globalThis.browser) {
 	globalThis.browser = globalThis.chrome;
 }
 
-console.debug('Background script loaded');
-console.debug('Icon URL', icon);
-
 async function getSteamId() {
 	const profileXML = await fetch('https://steamcommunity.com/my?xml=1').then((r) => r.text());
 	const match = profileXML.match(/<steamID64>(\d{17})<\/steamID64>/);
 	return match ? match[1] : null;
 }
 
-async function fetchInventory(steamId, appId, contextId) {
+async function fetchInventory(steamId: string, appId: number, contextId: number) {
 	// TODO: Send referrer header
 	// TODO: Load next batch of items (steam does 75 then 2000)
 	// TODO: Error handling
@@ -26,7 +22,7 @@ async function fetchInventory(steamId, appId, contextId) {
 	return inventory;
 }
 
-async function getUserInventory(appId, contextId) {
+async function getUserInventory(appId: number, contextId: number) {
 	const steamId = await getSteamId();
 	const inventory = await fetchInventory(steamId, appId, contextId);
 	return inventory;
@@ -46,10 +42,10 @@ async function ensureContentScript(tabId: number, attempt = 0) {
 		// otherwise if we receive a response, we know the content script is injected
 		return true;
 	} catch (error) {
-		const result = await browser.scripting.executeScript({
+		const result = await chrome.scripting.executeScript({
 			target: { tabId },
-			// files: [contentScript]
-			func: installHostScript,
+			func: injectorScript,
+			args: [scriptURL],
 		});
 		console.debug('Injected content script into tab', tabId, result);
 
@@ -92,10 +88,10 @@ browser.action.onClicked.addListener(async (tab) => {
 
   const tabId = tab.id;
 	// await ensureContentScript(tab.id)
-	const result = await browser.scripting.executeScript({
+	const result = await chrome.scripting.executeScript({
 		target: { tabId },
-		// files: [contentScript]
-		func: installHostScript,
+		func: injectorScript,
+		args: [scriptURL],
 	});
 	console.debug('Injected content script into tab', tabId, result);
 
