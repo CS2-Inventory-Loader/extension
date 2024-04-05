@@ -29,6 +29,7 @@ async function getUserInventory(appId: number, contextId: number) {
 }
 
 // internal helpers
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function ensureContentScript(tabId: number, attempt = 0) {
 	try {
 		// will throw if content script is not injected unless safari
@@ -64,7 +65,7 @@ async function executeCommand(fn, respond) {
 		.catch((err) => respond({ success: false, error: err.message }));
 }
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function requestHostPermission(tab) {
 	const tabUrl = new URL(tab.url);
 
