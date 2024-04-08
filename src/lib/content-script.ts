@@ -38,7 +38,6 @@ export default function injectorScript(scriptURL: string) {
   }
 
   handleEvent('cs2il:get-inventory', async (event) => {
-    console.log('cs2il:get-inventory', event);
     if (!event.detail) {
       throw new Error('loadInventory(appId, contextId) requires params, received none')
     }

@@ -1,5 +1,5 @@
 import contentScript from 'url:~lib/content-script';
-import injectorScript from '~lib/content-script';
+import injectorScript from '~/lib/content-script';
 import scriptURL from "url:~lib/inventory";
 
 if (!globalThis.browser) {
@@ -125,16 +125,12 @@ browser.permissions.onAdded.addListener(async (permissions) => {
 		id: 'content-script',
 		js: [contentScript],
 		matches: [...new Set([...(activeScript?.matches ?? []), ...newOrigins])],
-		runAt: 'document_idle',
+		runAt: 'document_idle' as const,
 	};
 
 	if (activeScript) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		await browser.scripting.updateContentScripts([newScript]);
 	} else {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		await browser.scripting.registerContentScripts([newScript]);
 	}
 
@@ -161,20 +157,16 @@ browser.permissions.onRemoved.addListener(async (permissions) => {
 		id: 'content-script',
 		js: [contentScript],
 		matches: newOrigins,
-		runAt: 'document_idle',
+		runAt: 'document_idle' as const,
 	};
 
 	if (activeScript) {
 		if (newScript.matches.length) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			await browser.scripting.updateContentScripts([newScript]);
 		} else {
 			await browser.scripting.unregisterContentScripts({ ids: ['content-script'] });
 		}
 	} else if (newScript.matches.length) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		await browser.scripting.registerContentScripts([newScript]);
 	}
 

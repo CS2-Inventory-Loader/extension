@@ -10,7 +10,7 @@
 , "src/lib/inventory.ts"  ],
   "compilerOptions": {
     "paths": {
-      "~*": [
+      "~/*": [
         "./src/*"
       ]
     },
