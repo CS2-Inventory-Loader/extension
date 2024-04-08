@@ -30,14 +30,25 @@ Check if cs2inventory is present in user browser. Fetch inventory using the exte
 </script>
 ```
 
-### Install (dev)
-1. Visit chrome://extensions
+### Install
+
+Build the extension in development or production mode:
+
+```bash
+npm install
+# development mode
+npm run dev
+# production mode
+npm run build
+```
+Then load the extension into your browser:
+1. Visit `chrome://extensions`
 2. Enable developer mode (upper right corner)
 3. Click "Load unpacked"
-4. Select `extension` directory from this repository
+4. Select `build` directory from this repository
 
 ### Logs
-1. Visit chrome://extensions
+1. Visit `chrome://extensions`
 2. Click "service worker" under the extension card
 
 ![Open Service Worker](.github/image.png)

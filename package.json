@@ -1,15 +1,59 @@
 {
   "name": "cs2-inventory-extension",
+  "displayName": "CS2 Inventory Loader",
+  "description": "Load your CS2 Steam inventory and share it with various websites",
+  "author": "CS2-Inventory-Loader",
   "version": "0.0.1",
   "scripts": {
-    "lint": "eslint ."
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "lint": "eslint ./src --ext .ts -c .eslintrc"
+  },
+  "dependencies": {
+    "plasmo": "0.85.2",
+    "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@types/chrome": "0.0.258",
     "@types/firefox-webext-browser": "^120.0.3",
+    "@types/node": "20.11.5",
+    "@types/webextension-polyfill": "^0.10.7",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "3.2.4",
+    "typescript": "5.3.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://steamcommunity.com/my",
+      "https://steamcommunity.com/inventory/*/730/2",
+      "https://cs2inventory.dev/*"
+    ],
+    "optional_host_permissions": [
+      "https://*/*"
+    ],
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "permissions": [
+      "scripting",
+      "activeTab"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "*.js"
+        ],
+        "matches": [
+          "<all_urls>"
+        ]
+      }
+    ]
   }
 }
