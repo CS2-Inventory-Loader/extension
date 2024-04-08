@@ -32,8 +32,7 @@
   "manifest": {
     "host_permissions": [
       "https://steamcommunity.com/my",
-      "https://steamcommunity.com/inventory/*/730/2",
-      "https://cs2inventory.dev/*"
+      "https://steamcommunity.com/inventory/*/730/2"
     ],
     "optional_host_permissions": [
       "https://*/*"
