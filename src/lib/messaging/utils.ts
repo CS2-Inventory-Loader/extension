@@ -1,13 +1,11 @@
-import type { MessageRequest } from '~/lib/messaging/types'
-import { getBrowser } from '~/lib/utils'
+import { getBrowser } from '~/lib/utils';
+
+import type { MessageRequest } from '~/lib/messaging/types';
 
 export function getRuntime() {
-  return getBrowser().runtime
+	return getBrowser().runtime;
 }
 
-export function isSameOrigin(
-  event: MessageEvent<MessageRequest>,
-) {
-  return event.source === globalThis.window 
-    && event.data.name
+export function isSameOrigin(event: MessageEvent<MessageRequest>) {
+	return event.source === globalThis.window && event.data.name;
 }

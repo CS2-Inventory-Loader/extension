@@ -1,12 +1,11 @@
-import { installHostScript } from '~/lib/content/install-host-script'
-import { handleMessages, relayMessages } from '~/lib/messaging/content-script'
+import { installHostScript } from '~/lib/content/install-host-script';
+import { handleMessages, relayMessages } from '~/lib/messaging/content-script';
 
 (() => {
-  handleMessages()
-  relayMessages()
+	handleMessages();
+	relayMessages();
 
-  installHostScript()
+	installHostScript();
 
-  console.log('Content Script installed')
-})()
-
+	console.log('Content Script installed');
+})();
