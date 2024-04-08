@@ -44,8 +44,16 @@ function messageListener(
   return true
 }
 
-export function handleMessages() {
+export function handleMessages(
+  messageHandlers?: { [name: string]: MessageHandler }
+) {
   getRuntime().onMessage.addListener(messageListener)
+
+  if (messageHandlers) {
+    for (const [name, handler] of Object.entries(messageHandlers)) {
+      onMessage(name, handler)
+    }
+  }
 }
 
 export async function detectContentScript(tabId: number) {

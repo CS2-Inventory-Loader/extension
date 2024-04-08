@@ -1,63 +1,82 @@
-export function installPermissionsHandlers() {
-  
+import { joinRelativeURL } from 'ufo'
+
+import contetntScriptURL from 'url:~/injectables/content-script'
+import { getBrowser } from '~/lib/utils';
+
+async function updateContentScripts(
+	origins: string[], 
+	activeOrigins?: string[]
+) {
+	if (!activeOrigins) {
+		activeOrigins = await getActiveOrigins()
+	}
+
+	if (origins.length === 0) {
+		if (activeOrigins.length === 0) {
+			// Nothing to do
+			return
+		}
+
+		await getBrowser().scripting.unregisterContentScripts({ ids: ['content-script'] });
+		return
+	}
+
+	const dedupedOrigins = Array.from(new Set(origins))
+
+	const script = {
+		id: 'content-script',
+		js: [joinRelativeURL(contetntScriptURL)],
+		matches: dedupedOrigins,
+		runAt: 'document_idle' as const,
+	}
+
+	if (activeOrigins.length === 0) {
+		// This is the first origin, install new script
+		await getBrowser().scripting.registerContentScripts([script])
+		return
+	}
+
+	await getBrowser().scripting.updateContentScripts([script])
 }
 
-browser.permissions.onAdded.addListener(async (permissions) => {
-	const newOrigins = permissions.origins;
-	if (!newOrigins.length) return;
-
-	console.debug('Permission added for', newOrigins);
-
+async function getActiveOrigins() {
 	const [activeScript] = await browser.scripting.getRegisteredContentScripts({ ids: ['content-script'] });
 
-	const newScript = {
-		id: 'content-script',
-		js: [contentScript],
-		matches: [...new Set([...(activeScript?.matches ?? []), ...newOrigins])],
-		runAt: 'document_idle' as const,
-	};
-
-	if (activeScript) {
-		await browser.scripting.updateContentScripts([newScript]);
-	} else {
-		await browser.scripting.registerContentScripts([newScript]);
+	if (!activeScript) {
+		return []
 	}
 
-	console.debug('Updated content script following origin permission change', newScript.matches);
-});
+	return activeScript.matches
+}
 
-browser.permissions.onRemoved.addListener(async (permissions) => {
-	const removedOrigins = permissions.origins;
-	if (!removedOrigins.length) return;
+export function installPermissionsHandlers() {
+  getBrowser().permissions.onAdded.addListener(async (permissions) => {
+		const newOrigins = permissions.origins;
 
-	console.debug('Removed permission for', removedOrigins);
-
-	const [activeScript] = await browser.scripting.getRegisteredContentScripts({ ids: ['content-script'] });
-
-	const newOrigins = [];
-	if (activeScript) {
-		for (const origin of activeScript.matches) {
-			if (removedOrigins.includes(origin)) continue;
-			newOrigins.push(origin);
+		if (!newOrigins.length) {
+			return;
 		}
-	}
+	
+		console.debug('🔓 Permission added for', newOrigins);
+	
+		const activeOrigins = await getActiveOrigins()
+		const origins = Array.from(new Set([...activeOrigins, ...newOrigins]))
 
-	const newScript = {
-		id: 'content-script',
-		js: [contentScript],
-		matches: newOrigins,
-		runAt: 'document_idle' as const,
-	};
+		await updateContentScripts(origins, activeOrigins)
+	});
+	
+	getBrowser().permissions.onRemoved.addListener(async (permissions) => {
+		const removedOrigins = permissions.origins;
 
-	if (activeScript) {
-		if (newScript.matches.length) {
-			await browser.scripting.updateContentScripts([newScript]);
-		} else {
-			await browser.scripting.unregisterContentScripts({ ids: ['content-script'] });
+		if (!removedOrigins.length) {
+			return;
 		}
-	} else if (newScript.matches.length) {
-		await browser.scripting.registerContentScripts([newScript]);
-	}
+	
+		console.debug('🔒 Permissions removed for', removedOrigins);
+	
+		const activeOrigins = await getActiveOrigins()
+		const origins = activeOrigins.filter((origin) => !removedOrigins.includes(origin))
 
-	console.debug('Updated content script following origin permission change', newScript.matches);
-});
+		await updateContentScripts(origins, activeOrigins)
+	});
+}
