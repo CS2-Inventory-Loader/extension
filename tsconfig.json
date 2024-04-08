@@ -7,7 +7,7 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx"
-, "src/lib/inventory.ts"  ],
+  ],
   "compilerOptions": {
     "paths": {
       "~/*": [
