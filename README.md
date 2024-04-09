@@ -36,16 +36,14 @@ Build the extension in development or production mode:
 
 ```bash
 npm install
-# development mode
 npm run dev
-# production mode
-npm run build
 ```
+
 Then load the extension into your browser:
 1. Visit `chrome://extensions`
 2. Enable developer mode (upper right corner)
 3. Click "Load unpacked"
-4. Select `build` directory from this repository
+4. Select `build/chrome-mv3-dev` directory from this repository
 
 ### Logs
 1. Visit `chrome://extensions`
